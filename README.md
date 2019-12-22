@@ -2,12 +2,15 @@
 Test tool class for collecting android logs, is used for the android test.
 
 eg:
+
 You can use collect function as follows:
+
 Log.e("LogCollector", "test getMomentLog");
 String result = LogCollector.collect();
 assertTrue(result.contains("test getMomentLog"));
 
 You can use clear function as follows:
+
 String info = "test clear";
 Log.e("LogCollector", info);
 String result = LogCollector.collect();
