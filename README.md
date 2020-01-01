@@ -5,9 +5,9 @@ eg:
 
 You can use collect function as follows:
 
-    Log.e("LogCollector", "test getMomentLog");
+    Log.e("LogCollector", "test collect");
     String result = LogCollector.collect();
-    assertTrue(result.contains("test getMomentLog"));
+    assertTrue(result.contains("test collect"));
 
 You can use clear function as follows:
 
