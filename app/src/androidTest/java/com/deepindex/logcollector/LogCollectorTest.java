@@ -10,10 +10,10 @@ import static org.junit.Assert.*;
  */
 public class LogCollectorTest {
     @Test
-    public void getMomentLog() {
-        Log.e("LogCollector", "test getMomentLog");
+    public void collect() {
+        Log.e("LogCollector", "test collect");
         String result = LogCollector.collect();
-        assertTrue(result.contains("test getMomentLog"));
+        assertTrue(result.contains("test collect"));
     }
 
     @Test

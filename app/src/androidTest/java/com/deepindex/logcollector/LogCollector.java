@@ -14,48 +14,50 @@ import java.util.Date;
 public class LogCollector {
     private static final String TAG = LogCollector.class.getSimpleName();
     private static final int BUF_SIZE = 8192;
-    private static final long DEFAULT_RECENT_INTERVAL_TIME = 1 * 1000L;
+    private static final long DEFAULT_INTERVAL_TIME = 1 * 1000L;
 
     private LogCollector() {
+        // null
     }
 
     /**
      * collect logs. call logcat command: logcat ...
+     *
      * @param intervalTime log time interval.
      * @return the collected logs.
      */
     public static String collect(long intervalTime) {
         if (intervalTime <= 0) {
-            intervalTime = DEFAULT_RECENT_INTERVAL_TIME;
+            intervalTime = DEFAULT_INTERVAL_TIME;
         }
         StringBuilder sb = new StringBuilder();
-        InputStreamReader input = null;
+        InputStreamReader inputStreamReader = null;
         try {
             Date date = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss.mmm");
             date.setTime(System.currentTimeMillis() - intervalTime);
-            java.lang.Process logcat =
+            String timeFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss.mmm").format(date);
+            java.lang.Process logcatProcess =
                 new ProcessBuilder("/system/bin/logcat", "-b", "events", "-b", "system", "-b",
-                    "main", "-b", "crash", "-d", "-t", sdf.format(date)).redirectErrorStream(true)
+                    "main", "-b", "crash", "-d", "-t", timeFormat).redirectErrorStream(true)
                     .start();
             try {
-                logcat.getOutputStream().close();
-                logcat.getErrorStream().close();
+                logcatProcess.getOutputStream().close();
+                logcatProcess.getErrorStream().close();
             } catch (IOException e) {
             }
-            input = new InputStreamReader(logcat.getInputStream());
+            inputStreamReader = new InputStreamReader(logcatProcess.getInputStream());
 
-            int num;
-            char[] buf = new char[BUF_SIZE];
-            while ((num = input.read(buf)) > 0) {
-                sb.append(buf, 0, num);
+            int size;
+            char[] buffer = new char[BUF_SIZE];
+            while ((size = inputStreamReader.read(buffer)) > 0) {
+                sb.append(buffer, 0, size);
             }
         } catch (IOException e) {
             Log.e(TAG, "Error running logcat", e);
         } finally {
-            if (input != null) {
+            if (inputStreamReader != null) {
                 try {
-                    input.close();
+                    inputStreamReader.close();
                 } catch (IOException e) {
                 }
             }
@@ -64,7 +66,7 @@ public class LogCollector {
     }
 
     public static String collect() {
-        return collect(DEFAULT_RECENT_INTERVAL_TIME);
+        return collect(DEFAULT_INTERVAL_TIME);
     }
 
     /**
@@ -72,11 +74,11 @@ public class LogCollector {
      */
     public static void clear() {
         try {
-            java.lang.Process logcat =
+            java.lang.Process logcatProcess =
                 new ProcessBuilder("/system/bin/logcat", "-c").redirectErrorStream(true).start();
-            logcat.getOutputStream().close();
-            logcat.getErrorStream().close();
-            logcat.getInputStream().close();
+            logcatProcess.getOutputStream().close();
+            logcatProcess.getErrorStream().close();
+            logcatProcess.getInputStream().close();
         } catch (IOException e) {
             Log.e(TAG, "Error running logcat", e);
         }
